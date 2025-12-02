@@ -29,15 +29,40 @@ public class Statistics {
     }
 
     public void printIslandMap() {
-        System.out.println("\nIsland Map:");
+        System.out.println("\nIsland Map (10x10):");
+        System.out.println("=".repeat(45)); // Верхняя граница
+
         Location[][] locations = island.getLocations();
+
         for (int y = 0; y < island.getHeight(); y++) {
+            System.out.print("| ");
             for (int x = 0; x < island.getWidth(); x++) {
                 Location location = locations[y][x];
-                String cellRepresentation = getCellRepresentation(location);
-                System.out.println(cellRepresentation + " ");
+                String cellRepresentation = getCellSymbol(location);
+                System.out.print(cellRepresentation + " | ");
             }
             System.out.println();
+            if (y < island.getHeight() - 1) {
+                System.out.println("-".repeat(45));
+            }
+        }
+        System.out.println("=".repeat(45)); // Нижняя граница
+    }
+
+    private String getCellSymbol(Location location) {
+        Map<AnimalType, Integer> typeCounts = new java.util.HashMap<>();
+        for (Animal animal : location.getAnimals()) {
+            if (animal.isAlive()) {
+                typeCounts.merge(animal.getType(), 1, Integer::sum);
+            }
+        }
+        if (typeCounts.isEmpty()) {
+            return location.getPlant().isAlive() ? "🌿" : "·";
+        } else {
+            return typeCounts.entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .map(entry -> entry.getKey().getEmoji())
+                    .orElse("·");
         }
     }
 
